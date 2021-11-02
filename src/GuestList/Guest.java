@@ -1,3 +1,5 @@
+package GuestList;
+
 public class Guest {
     private String lastName;
     private String firstName;

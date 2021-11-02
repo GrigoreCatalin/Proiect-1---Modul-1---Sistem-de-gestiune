@@ -1,5 +1,10 @@
+package GuestList;
+import Exception.InvalidNumberException;
+
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
 
 public class GuestList {
 
@@ -12,13 +17,34 @@ public class GuestList {
         this.waitList = new ArrayList<>();
     }
 
-    public static void setSpotAvailableForList(int spotAvailableForList) {
-        GuestList.spotAvailableForList = spotAvailableForList;
+    public static int setSpotAvailableForList()  {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Bun venit! Introduceti numarul de locuri disponibile:");
+
+        while (true) {
+            try {
+                spotAvailableForList = sc.nextInt();
+                if (spotAvailableForList <= 0) {
+                    throw new InvalidNumberException();
+                }
+                return spotAvailableForList;
+            }  catch (InvalidNumberException e){
+                sc.nextLine();
+                System.out.println(e.getMessage());
+            }catch (InputMismatchException e) {
+                sc.nextLine();
+                System.out.println("Nu ai introdus o valoare intreaga. Te rog sa reincerci.");
+            }
+            finally {
+                GuestList.spotAvailableForList = spotAvailableForList;
+            }
+        }
     }
 
     // Adaugare obiect in ArrayList
     public int insertGuest(Guest guest) {
         if (searchGuestByEmail(guest) == true) {
+            System.out.println("Persoana face parte deja din lista");
             return -1;
         } else if (list.size() < spotAvailableForList) {
             list.add(guest);
@@ -72,7 +98,7 @@ public class GuestList {
         return false;
     }
 
-    private Guest checkGuestForList(Guest guest) {
+    private Guest checkGuestForList(Guest guest) throws NullPointerException {
         for (Guest item : list) {
             if (item.equals(guest)) {
                 guest = item;
@@ -87,22 +113,27 @@ public class GuestList {
                 }
             }
         }
-        return null;
+        throw new NullPointerException("Persoana din lista nu exista");
     }
 
     // Stergere obiect din ArrayList
-    public boolean removeGuest(Guest objectForTest) {
+    public boolean removeGuest(Guest objectForTest) throws NullPointerException{
         if (waitList.size() == 0) {
             Guest referenceTest = checkGuestForList(objectForTest);
             if (referenceTest != null) {
                 list.remove(referenceTest);
                 System.out.println("Stergerea persoanei s-a realizat cu succes.");
+            } else {
+                throw new NullPointerException("Persoana din lista nu exista");
             }
         } else { // daca waitList.size != 0
             Guest test2 = checkGuestForList(objectForTest);
             if (test2 != null) {
                 list.remove(test2);
+            } else {
+                throw new NullPointerException("Persoana din lista nu exista");
             }
+
             if (list.size() < spotAvailableForList) {
                 list.add(waitList.get(0));
                 System.out.println("Felicitari! Locul tau la eveniment este confirmat. Te asteptam!");
@@ -115,31 +146,31 @@ public class GuestList {
     }
 
 
-    public Guest updateGuestDetails(Guest guest) {
+    public Guest updateGuestDetails(Guest guest) throws NullPointerException{
         Guest guestFromArrayList = checkGuestForList(guest);
 
         if (guestFromArrayList != null) {
             return guestFromArrayList;
         }
-        return null;
-    }
+        throw new NullPointerException("Persoana din lista nu exista");
+        }
 
-    public void search (String subString){
+    public void search(String subString) {
         ArrayList<Guest> search = new ArrayList<>();
         search.addAll(list);
         search.addAll(waitList);
 
         ArrayList<Guest> results = new ArrayList<>();
-        for(Guest item : search){
-            if(search(item.getLastName(), subString) || search(item.getFirstName(), subString) || search(item.getEmail(), subString)
-            || search(item.getPhoneNumber(), subString)){
+        for (Guest item : search) {
+            if (search(item.getLastName(), subString) || search(item.getFirstName(), subString) || search(item.getEmail(), subString)
+                    || search(item.getPhoneNumber(), subString)) {
                 results.add(item);
-                System.out.println("Contactul: " +  item.getLastName() + " " + item.getFirstName() + " " + item.getEmail() + " " + item.getPhoneNumber());
+                System.out.println("Contactul: " + item.getLastName() + " " + item.getFirstName() + " " + item.getEmail() + " " + item.getPhoneNumber());
             }
         }
     }
 
-    private boolean search (String str, String substring) {
+    private boolean search(String str, String substring) {
         if (str.toLowerCase().contains(substring.toLowerCase())) {
             return true;
         }

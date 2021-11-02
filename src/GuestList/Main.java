@@ -1,3 +1,6 @@
+package GuestList;
+
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -10,8 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Bun venit! Introduceti numarul de locuri disponibile:");
-        myGuestList.setSpotAvailableForList(sc.nextInt());
+        myGuestList.setSpotAvailableForList();
 
         while (true) {
             String keyboardCommand = display("Asteapta comanda: (help - Afiseaza lista de comenzi)");
@@ -24,7 +26,7 @@ public class Main {
                             + "\n" + "check - Verifica daca o persoana este inscrisa la eveniment" + "\n" + "remove - Sterge o persoana existenta din lista" +
                             "\n" + "update - Actualizeaza detaliile unei persoane" + "\n" + "guests  - Lista de persoane care participa la eveniment" + "\n"
                             + "waitlist - Persoanele din lista de asteptare" + "\n" + "available - Numarul de locuri libere" + "\n"
-                            + "guest_no - Numarul de persoane care participa la eveniment" + "\n" + "waitlist_no - Numarul de persoane din lista de asteptare" +
+                            + "guests_no - Numarul de persoane care participa la eveniment" + "\n" + "waitlist_no - Numarul de persoane din lista de asteptare" +
                             "\n" + "subscribe_no  - Numarul total de persoane inscrise" + "\n" + "search - Cauta toti invitatii conform sirului de caractere introdus"
                             + "\n" + "quit - Inchide aplicatia");
                     checkCommandWord = true;
@@ -43,9 +45,8 @@ public class Main {
                 case ("remove"):
                     if (check()) {
                         myGuestList.removeGuest(objectForCheck);
-                    } else {
-                        System.out.println("Eroare: Persoana nu este inscrisa la eveniment.");
                     }
+
                     checkCommandWord = true;
                     break;
 
@@ -145,13 +146,26 @@ public class Main {
         return false;
     }
 
+    private static int validNumber() {
+        while (true) {
+            try {
+                int checkNumber = sc.nextInt();
+             return checkNumber;
+            } catch (InputMismatchException e) {
+                sc.nextLine();
+                System.out.println("Introduce datele conform credentialelor de mai sus");
+            }
+        }
+    }
+
     //Setare parametrii pentru objectForTest
     private static Guest checkedGuest(Guest objectForTest) {
         String checkSearch = "";
-        int checkNumber = sc.nextInt();
+        int checkNumber = validNumber();
+
         switch (checkNumber) {
             case 1:
-                checkSearch = display("Intoduceti numele");
+                checkSearch = display("Introduceti numele");
                 objectForTest.setFirstName(checkSearch);
 
                 checkSearch = display("Intoduceti prenumele");
@@ -180,7 +194,7 @@ public class Main {
 
 
         String checkSearch = "";
-        int checkNumber = sc.nextInt();
+        int checkNumber = validNumber();
         switch (checkNumber) {
             case 1:
                 checkSearch = display("Introduceti numele de familie:");
