@@ -1,5 +1,7 @@
 package GuestList;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -12,8 +14,15 @@ public class Main {
     static Guest objectForCheck = new Guest("", "", "", "");
 
     public static void main(String[] args) {
+        try {
+            myGuestList.readFromBinaryFile();
+        } catch (IOException e) {
+            System.out.println("Deocamdata nu exista nicio varianta de back-up");
+        }
 
-        myGuestList.setSpotAvailableForList();
+        if (myGuestList.getList().size() == 0) {
+            myGuestList.setSpotAvailableForList();
+        }
 
         while (true) {
             String keyboardCommand = display("Asteapta comanda: (help - Afiseaza lista de comenzi)");
@@ -28,7 +37,7 @@ public class Main {
                             + "waitlist - Persoanele din lista de asteptare" + "\n" + "available - Numarul de locuri libere" + "\n"
                             + "guests_no - Numarul de persoane care participa la eveniment" + "\n" + "waitlist_no - Numarul de persoane din lista de asteptare" +
                             "\n" + "subscribe_no  - Numarul total de persoane inscrise" + "\n" + "search - Cauta toti invitatii conform sirului de caractere introdus"
-                            + "\n" + "quit - Inchide aplicatia");
+                            + "reset - Reseteaza toate datele salvate" + "\n" + "quit - Inchide aplicatia" + "\n" );
                     checkCommandWord = true;
                     break;
                 case ("add"):
@@ -98,6 +107,15 @@ public class Main {
                     break;
 
                 case ("quit"):
+                    ArrayList<Guest> list = myGuestList.getList();
+                    ArrayList<Guest> waitList = myGuestList.getWaitList();
+
+                    try {
+                        myGuestList.writeToBinaryFile(list, waitList);
+                    } catch (IOException e) {
+                        System.out.println("S-a produs o eroare");
+                    }
+
                     System.out.println("Aplicatia se inchide");
                     checkCommandWord = true;
                     return;
@@ -150,7 +168,7 @@ public class Main {
         while (true) {
             try {
                 int checkNumber = sc.nextInt();
-             return checkNumber;
+                return checkNumber;
             } catch (InputMismatchException e) {
                 sc.nextLine();
                 System.out.println("Introduce datele conform credentialelor de mai sus");
@@ -222,5 +240,7 @@ public class Main {
         objectForTest.setCompareCase(checkNumber);
 
         return objectForTest;
+
+
     }
 }

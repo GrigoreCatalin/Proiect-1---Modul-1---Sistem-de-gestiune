@@ -1,23 +1,68 @@
 package GuestList;
+
 import Exception.InvalidNumberException;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-public class GuestList {
+
+public class GuestList implements Serializable {
 
     private ArrayList<Guest> list;
     private ArrayList<Guest> waitList;
     static private int spotAvailableForList;
+    private ObjectInputStream binaryFileOutList;
+    private ObjectInputStream binaryFileOuWaitList;
+
+    private static final long serialVersionUID = 1L;
 
     public GuestList() {
         this.list = new ArrayList<>();
         this.waitList = new ArrayList<>();
     }
 
-    public static int setSpotAvailableForList()  {
+    public ArrayList<Guest> getList() {
+        return this.list;
+    }
+
+    public ArrayList<Guest> getWaitList() {
+        return this.waitList;
+    }
+
+    public void writeToBinaryFile(ArrayList<Guest> list, ArrayList<Guest> waitList) throws IOException {
+        try (ObjectOutputStream binaryFileOut = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("List.dat")))) {
+            binaryFileOut.writeObject(list);
+        }
+        try (ObjectOutputStream binaryFileOut = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("WaitList.dat")))) {
+            binaryFileOut.writeObject(waitList);
+        }
+    }
+
+    public void readFromBinaryFile() throws IOException {
+        try (ObjectInputStream binaryFileOutList = new ObjectInputStream(new BufferedInputStream(new FileInputStream("List.dat")))) {
+            this.list = (ArrayList<Guest>) binaryFileOutList.readObject();
+        } catch (ClassNotFoundException e) {
+            System.out.println("A aparut o eroare: " + e.getMessage());
+        }
+
+        try (ObjectInputStream binaryFileOutWaitList = new ObjectInputStream(new BufferedInputStream(new FileInputStream("WaitList.dat")))) {
+            this.waitList = (ArrayList<Guest>) binaryFileOutWaitList.readObject();
+        } catch (ClassNotFoundException e) {
+            System.out.println("A aparut o eroare: " + e.getMessage());
+        }
+    }
+
+    public static int setSpotAvailableForList() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Bun venit! Introduceti numarul de locuri disponibile:");
 
@@ -28,14 +73,13 @@ public class GuestList {
                     throw new InvalidNumberException();
                 }
                 return spotAvailableForList;
-            }  catch (InvalidNumberException e){
+            } catch (InvalidNumberException e) {
                 sc.nextLine();
                 System.out.println(e.getMessage());
-            }catch (InputMismatchException e) {
+            } catch (InputMismatchException e) {
                 sc.nextLine();
                 System.out.println("Nu ai introdus o valoare intreaga. Te rog sa reincerci.");
-            }
-            finally {
+            } finally {
                 GuestList.spotAvailableForList = spotAvailableForList;
             }
         }
@@ -117,7 +161,7 @@ public class GuestList {
     }
 
     // Stergere obiect din ArrayList
-    public boolean removeGuest(Guest objectForTest) throws NullPointerException{
+    public boolean removeGuest(Guest objectForTest) throws NullPointerException {
         if (waitList.size() == 0) {
             Guest referenceTest = checkGuestForList(objectForTest);
             if (referenceTest != null) {
@@ -146,14 +190,14 @@ public class GuestList {
     }
 
 
-    public Guest updateGuestDetails(Guest guest) throws NullPointerException{
+    public Guest updateGuestDetails(Guest guest) throws NullPointerException {
         Guest guestFromArrayList = checkGuestForList(guest);
 
         if (guestFromArrayList != null) {
             return guestFromArrayList;
         }
         throw new NullPointerException("Persoana din lista nu exista");
-        }
+    }
 
     public void search(String subString) {
         ArrayList<Guest> search = new ArrayList<>();
